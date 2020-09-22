@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My_3d_WFP_App", "My_3d_WFP_App.csproj", "{010E1915-0A0D-4DAE-B1BF-BFF2FD0C0A93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2130DDC1-C4F8-4AA6-8A88-A1E8487307EC}"
+	ProjectSection(SolutionItems) = preProject
+		BasicModel.cs = BasicModel.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{010E1915-0A0D-4DAE-B1BF-BFF2FD0C0A93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{010E1915-0A0D-4DAE-B1BF-BFF2FD0C0A93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{010E1915-0A0D-4DAE-B1BF-BFF2FD0C0A93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{010E1915-0A0D-4DAE-B1BF-BFF2FD0C0A93}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A8AACE4-7EAF-4EC9-97D3-6641E205F339}
+	EndGlobalSection
+EndGlobal
