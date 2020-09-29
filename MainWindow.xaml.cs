@@ -20,6 +20,7 @@ using System.Xml;
 using HelixToolkit.Wpf;
 using System.Windows.Media.Media3D;
 using Microsoft.Win32;
+using HelixToolkit.Wpf.SharpDX;
 
 namespace My_3d_WFP_App
 {
@@ -46,12 +47,15 @@ namespace My_3d_WFP_App
             private List<string> names;
             private List<string> paths;
             private Model3DGroup scene;
+            private List<double[]> transformations;
+
 
             public MyScene()
             {
                 names = new List<string>();
                 paths = new List<string>();
                 scene = new Model3DGroup();
+                transformations = new List<double[]>();
             }
 
             /// <summary>
@@ -66,22 +70,15 @@ namespace My_3d_WFP_App
                 while (names.Contains(almostUnicName)) {
                     almostUnicName = unicName + unicNumber++;
                 }
-
-                names.Add(almostUnicName);                
+                names.Add(almostUnicName);
                 paths.Add(path);
-                scene.Children.Add(new ModelImporter().Load(path));
+                transformations.Add(new double[7] { 0, 0, 0, 0, 0, 0, 100 }); // x, y, z, xangle, yangle, zangle, scale;
+                scene.Children.Add(new HelixToolkit.Wpf.ModelImporter().Load(path));
                 RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 90));
-                myRotateTransform.CenterX = 0;
-                myRotateTransform.CenterY = 0;
-                myRotateTransform.CenterZ = 0;
                 scene.Children.Last().Transform = myRotateTransform;
                 var sizex = scene.Children.Last().Bounds.SizeX;
-                var sizey = scene.Children.Last().Bounds.SizeY;
-                var sizez = scene.Children.Last().Bounds.SizeZ;
-
                 var x = scene.Children.Last().Bounds.X;
-                var y = scene.Children.Last().Bounds.Y;
-                var z = scene.Children.Last().Bounds.Z;
+
             }
 
             /// <summary>
@@ -99,16 +96,18 @@ namespace My_3d_WFP_App
             }
 
             /// <summary>
-            /// Rotate method
+            /// Rotation method
             /// </summary>
-            /// <param name="selected Model name"></param>
-            /// <param name="vector (format: (0,1,0) - only 1 axis is chosen)"></param>
-            /// <param name="angle"></param>
-            public void Rotate(string selectedModel, Vector3D vector, double angle)
-            {                
-                var matrix = scene.Children.ElementAt(names.IndexOf(selectedModel)).Transform.Value;
-                matrix.Rotate(new Quaternion(vector, angle));
-                scene.Children.ElementAt(names.IndexOf(selectedModel)).Transform = new MatrixTransform3D(matrix);
+            /// <param name="selectedModel"></param>
+            /// <param name="angleX"></param>
+            /// <param name="angleY"></param>
+            /// <param name="angleZ"></param>
+            public void Rotate(string selectedModel, double angleX, double angleY, double angleZ)
+            {
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(angleX, 3);
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(angleY, 4);
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(angleZ, 5);
+                Transform(selectedModel);
             }
 
             /// <summary>
@@ -120,12 +119,40 @@ namespace My_3d_WFP_App
             /// <param name="New Z coordinate"></param>
             public void Move(string selectedModel, double offsetX, double offsetY, double offsetZ)
             {
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(offsetX, 0);
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(offsetY, 1);
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(offsetZ, 2);
+                Transform(selectedModel);
+            }
+
+
+            public void Resize(string selectedModel, double size)
+            {
+                transformations.ElementAt(names.IndexOf(selectedModel)).SetValue(size, 6);
+                Transform(selectedModel);
+            }
+
+            /// <summary>
+            /// Transform model when values changed
+            /// </summary>
+            /// <param name="selectedModel"></param>
+            public void Transform(string selectedModel)
+            {
                 Transform3DGroup transform = new Transform3DGroup();
-                RotateTransform3D rotateTrans = new RotateTransform3D();
-                TranslateTransform3D translateTrans = new TranslateTransform3D(offsetX, offsetY, offsetZ);
-                transform.Children.Add(rotateTrans);
-                transform.Children.Add(translateTrans);
+                transform.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 90 + transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(3))));
+                transform.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 0 + transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(4))));
+                transform.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 0, 1), 0 + +transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(5))));
+                transform.Children.Add(new TranslateTransform3D(transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(0),
+                                                                transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(1),
+                                                                transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(2)));
+                var size = transformations.ElementAt(names.IndexOf(selectedModel)).ElementAt(6);
+                transform.Children.Add(new ScaleTransform3D(size/100, size / 100, size / 100));
                 scene.Children.ElementAt(names.IndexOf(selectedModel)).Transform = transform;
+            }
+
+            public double[] GetTransformations(string selectedModel)
+            {
+                return transformations.ElementAt(names.IndexOf(selectedModel));
             }
 
             public List<string> Names
@@ -187,7 +214,7 @@ namespace My_3d_WFP_App
 
         private void UploadModelFromFile(object sender, RoutedEventArgs e)
         {
-
+            AddNewFileToModelList();
         }
 
         /// <summary>
@@ -197,27 +224,30 @@ namespace My_3d_WFP_App
         /// <param name="e"></param>
         private void AddModelToScene(object sender, RoutedEventArgs e)
         {
-            myScene.AddElement(@"furniture/" + (string)cbModelList.SelectedItem + ".obj");
+            myScene.AddElement("C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/" + (string)cbModelList.SelectedItem + ".obj");
             lvScene.ItemsSource = myScene.Names;
             lvScene.Items.Refresh();
         }
 
-        private static void AddNewFileToModelList(string newModel)
+        private void AddNewFileToModelList()
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-
-            string newModelName = Path.GetFileNameWithoutExtension(newModel);
-            var IsKeyFound = false;
-            foreach (var modelName in modelList)
+            fileDialog.Filter = "Obj files (*.obj)|*.obj";
+            Nullable<bool> result = fileDialog.ShowDialog();
+            string newModel;
+            if (result == true)
             {
-                if (modelName == newModelName) { IsKeyFound = true; }
-            }
-            if (!IsKeyFound)
-            {
+                newModel = fileDialog.FileName;
+                string directoryPath = System.IO.Path.GetDirectoryName(fileDialog.FileName);
+                string newModelName = Path.GetFileNameWithoutExtension(newModel);               
+                
                 File.Copy(newModel, $"C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/{Path.GetFileName(newModel)}");
-                modelList.Add(Path.GetFileNameWithoutExtension(newModelName));
+                modelList.Add($"C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/{Path.GetFileName(newModel)}");
+                myScene.AddElement(newModel);
+                lvScene.ItemsSource = myScene.Names;
+                
             }
-               
+            lvScene.Items.Refresh();
         }
 
         /// <summary>
@@ -243,31 +273,16 @@ namespace My_3d_WFP_App
         /// <param name="e"></param>
         private void angle_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
-            var angle = ((Slider)sender).Value;
-            var sender_name = ((Slider)sender).Name;
-            var modelName = (string)lvScene.SelectedItem;
-            var axis = new Vector3D(0, 0, 1);
-            switch (sender_name)
+            if (((Slider)sender).IsEnabled)
             {
-                case "Xangle":
-                    {
-                        axis = new Vector3D(1, 0, 0);
-                        break;
-                    }
-                case "Yangle":
-                    {
-                        axis = new Vector3D(0, 1, 0);
-                        break;
-                    }
-                case "Zangle":
-                    {
-                        axis = new Vector3D(0, 0, 1);
-                        break;
-                    }
-                default:
-                    break;
+                var selectedModel = (string)lvScene.SelectedItem;
+
+                var angleX = (double)slXangle.Value;
+                var angleY = (double)slYangle.Value;
+                var angleZ = (double)slZangle.Value;
+
+                myScene.Rotate(selectedModel, angleX, angleY, angleZ);
             }
-            myScene.Rotate(modelName, axis, angle);
         }
 
         private void Coordinate_ValueChanging(object sender, Syncfusion.Windows.Shared.ValueChangingEventArgs e)
@@ -277,6 +292,14 @@ namespace My_3d_WFP_App
             var z = (double)udZCoord.Value;
             var selectedModel = (string)lvScene.SelectedItem;
             myScene.Move(selectedModel, x, y, z);
+        }
+
+        
+        private void udModelSize_ValueChanging(object sender, Syncfusion.Windows.Shared.ValueChangingEventArgs e)
+        {
+            var size = (double)udModelSize.Value;
+            var selectedModel = (string)lvScene.SelectedItem;
+            myScene.Resize(selectedModel, size);
         }
 
         #endregion
@@ -358,19 +381,34 @@ namespace My_3d_WFP_App
             else
             {
                 lChosenModel.Content = lvScene.SelectedItem;
+                changeModelControlsEnablement(false);
+                updateControls();
                 changeModelControlsEnablement(true);
                 btnDeleteModelFromScene.IsEnabled = true;
             }
         }
+        
+        private void updateControls()
+        {
+            var sourse = myScene.GetTransformations((string)lvScene.SelectedItem);
+            udXCoord.Value = sourse.ElementAt(0);
+            udYCoord.Value = sourse.ElementAt(1);
+            udZCoord.Value = sourse.ElementAt(2);
+            slXangle.Value = sourse.ElementAt(3); /// -> value changed
+            slYangle.Value = sourse.ElementAt(4);
+            slZangle.Value = sourse.ElementAt(5);
+            udModelSize.Value = sourse.ElementAt(6);
+        }
+
 
         private void changeModelControlsEnablement(bool isEnabled)
         {            
             udXCoord.IsEnabled = isEnabled;
             udYCoord.IsEnabled = isEnabled;
             udZCoord.IsEnabled = isEnabled;
-            Xangle.IsEnabled = isEnabled;
-            Yangle.IsEnabled = isEnabled;
-            Zangle.IsEnabled = isEnabled;
+            slXangle.IsEnabled = isEnabled;
+            slYangle.IsEnabled = isEnabled;
+            slZangle.IsEnabled = isEnabled;
             udModelSize.IsEnabled = isEnabled;
         }
 
@@ -386,105 +424,11 @@ namespace My_3d_WFP_App
             changeModelControlsEnablement(true);
         }
         #endregion
-    }
-}
 
-
-/*
-public static void RemoveTextLines(string filename)
-{
-    // Initial values
-    string tempFilename = Path.GetFileNameWithoutExtension(filename) + "1" + ".xaml";
-
-    var openLine = "<Model3DGroup";
-    var isOpenLineFound = false;
-    int openLineCount = 0, closedLineCount = 0;
-    var closedLine = "</Model3DGroup>";
-    var isClosedLineFound = false;
-
-    var wrapOpenLine = "<ResourceDictionary xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"\n  xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">";
-    var wrapClosedLine = "</ResourceDictionary>";
-
-    // Read file
-    using (var streamReader = new StreamReader(filename))
-    {
-        // Write new file
-        using (var streamWriter = new StreamWriter(tempFilename))
+        private void slXangle_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            string line;
-            // write wrap line into temp file
-            streamWriter.WriteLine(wrapOpenLine);
-            // do while its not the end of file
-            while ((line = streamReader.ReadLine()) != null)
-            {
-                //if we have already found closed line, still checking if there is more open-close pairs
-                //просто проверочка, если следом сразу идет еще одно закрытие
-                if (isClosedLineFound)
-                {
-                    if (line.Contains(closedLine))
-                    {
-                        closedLineCount++;
-                        streamWriter.WriteLine(line);
-                        continue;
-                    }
-                }
-                // если одно закрытие найдено, то могут быть еще. обнуляем и продолжаем искать
-                if (isClosedLineFound) isClosedLineFound = isOpenLineFound = false;
-                // наверное, тут еще куча таких тегов, о которых я знать не знаю, но пока так. заплаточка
-                // убрать весь свет нафиг
-                if (line.Contains("<AmbientLight")) continue;
-                if (line.Contains("<DirectionalLight")) continue;
 
-                // if we haven't found Open Line
-                if (!isOpenLineFound)
-                {
-                    //if curr line is Open Line -> open line is found, write that line
-                    if (line.Contains(openLine))
-                    {
-                        isOpenLineFound = true;
-                        openLineCount++;
-                        //add KEY word for 1st match
-                        if (openLineCount == 1)
-                        {
-                            streamWriter.WriteLine($"<Model3DGroup x:Key=\"{filename}\" >");
-                        }
-                        else
-                        {
-                            // write "<Model3DGroup >" instead of "<Model3DGroup x:Name="Box04OR24">"
-                            // comments r usually started with new line
-                            // and this line: "<Model3DGroup x:Name="Box04OR24">" is usually closed with ">"
-                            streamWriter.WriteLine("<Model3DGroup >");
-                        }
-                    }
-                }
-                // if we have found Open line, but not the Closed One
-                else if (!isClosedLineFound)
-                {
-                    // if curr line is Closed line -> closed line is found, write that line
-                    if (line.Contains(closedLine))
-                    {
-                        isClosedLineFound = true;
-                        closedLineCount++;
-                    }
-                    streamWriter.WriteLine(line);
-                }
-            }
-            streamWriter.WriteLine(wrapClosedLine);
         }
     }
-    // Delete original file
-    File.Delete(filename);
-
-    // ... and put the temp file in its place.
-    File.Move(tempFilename, filename);
 }
-*/
-/*
-private void CreateScene()
-{
-    Model3DGroup model; //= HelixToolkit.Wpf.ModelImporter.Load(@"C:/Users/Anastasiia/source/repos/My_3d_WFP_App/cnek.obj",   );
-    ModelImporter importer = new ModelImporter();
-    model = new Model3DGroup();
-    Model3D chair = importer.Load("C:/Users/Anastasiia/source/repos/My_3d_WFP_App/cnek.obj");
-    model.Children.Add(chair);
-}*/
+

@@ -5,7 +5,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:_3DTools="clr-namespace:_3DTools;assembly=3DTools"
-        Title="MainWindow" Height="700" Width="800" ResizeMode="NoResize">
+        Title="MainWindow" Height="700" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
     <Grid>
         <Grid.ColumnDefinitions >
@@ -158,7 +158,7 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="z: " Grid.Column="0"/>
-                <syncfusion:UpDown x:Name="udZCoord" Grid.Column="1" IsEnabled="False"
+                <syncfusion:UpDown x:Name="udZCoord" Grid.Column="1" IsEnabled="False" 
                                    Step="0.1" MinValue="-1000" MaxValue="1000" Value="0" 
                                    ValueChanging="Coordinate_ValueChanging"/>
             </Grid>
@@ -172,9 +172,10 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="x: " Grid.Column="0"/>
-                <Slider x:Name="Xangle" Grid.Column="1" IsEnabled="False"
-                        Maximum="360" Minimum="-360" TickFrequency="1" Value="0"
-                        ValueChanged="angle_ValueChanged"/>
+                <Slider x:Name="slXangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
+                        Maximum="360" Minimum="-360" TickFrequency="45" Value="0"
+                        ValueChanged="angle_ValueChanged"
+                            />
             </Grid>
             <!--y angle-->
             <Grid Margin="0,4,0,0">
@@ -183,8 +184,8 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="y: " Grid.Column="0"/>
-                <Slider x:Name="Yangle" Grid.Column="1" IsEnabled="False"
-                        Maximum="360" Minimum="-360" TickFrequency="1" Value="0"
+                <Slider x:Name="slYangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
+                        Maximum="360" Minimum="-360" Value="0" TickFrequency="45" 
                         ValueChanged="angle_ValueChanged"/>
             </Grid>
             <!--z angle-->
@@ -194,8 +195,8 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="z: " Grid.Column="0"/>
-                <Slider x:Name="Zangle" Grid.Column="1" IsEnabled="False"
-                        Maximum="360" Minimum="-360" TickFrequency="1" Value="0"
+                <Slider x:Name="slZangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
+                        Maximum="360" Minimum="-360" TickFrequency="45"  Value="0"
                         ValueChanged="angle_ValueChanged"/>
             </Grid>
             <!--Model size-->
@@ -207,7 +208,8 @@
                 <Label Content="Size" Margin="0,-2,0,2"></Label>
                 <!--Sizes-->
                 <syncfusion:UpDown x:Name="udModelSize" Grid.Column="1" IsEnabled="False"
-                                   Step="0.1" MinValue="0.001" MaxValue="10000" Value="100" />
+                                   Step="0.1" MinValue="0.001" MaxValue="10000" Value="100"
+                                   ValueChanging="udModelSize_ValueChanging" />
             </Grid>
 
         </StackPanel>

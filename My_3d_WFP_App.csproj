@@ -133,9 +133,6 @@
     <None Include="furniture\12221_Cat_v1_l3.mtl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="furniture\12221_Cat_v1_l3.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="furniture\Cat climbing tower.mtl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
