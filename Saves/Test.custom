@@ -1,0 +1,7 @@
+floorWidth 8,40000000000001
+floorLength 10,7
+ceiling True
+models 2
+name source coordinateX coordinateY coordinateZ rotationX rotationY rotationZ size
+Cat C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/Cat.obj -4,1 7,9 15 360 360 360 32,4000000000002
+newsofa C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/newsofa.obj -3,5 -2,3 0,2 -360 -360 -360 96,5000000000002

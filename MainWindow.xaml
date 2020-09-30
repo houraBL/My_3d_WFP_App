@@ -5,215 +5,223 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:_3DTools="clr-namespace:_3DTools;assembly=3DTools"
-        Title="MainWindow" Height="700" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="MainWindow" Height="600" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <StackPanel>
+        <Menu x:Name="MainMenu" VerticalAlignment="Top" Height="24" Margin="2">
+            <MenuItem Header="File">
+                <MenuItem Header="New Project" x:Name="mnNewProject" Click="NewProject_Click"></MenuItem>
+                <MenuItem Header="Open Resent" x:Name="mnOpenResent" Click="OpenResent_Click"></MenuItem>
+                <MenuItem Header="Save Project" x:Name="mnSaveProject" Click="SaveProject_Click"></MenuItem>
+                <MenuItem Header="Exit" x:Name="mnExit" Click="Exit_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="&lt;3" x:Name="mnHeart" Click="Heart_Click"></MenuItem>
+        </Menu>
+        <Grid Height="546" Margin="0,2,0,0">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
 
-    <Grid>
-        <Grid.ColumnDefinitions >
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
+            <!-- Left menu: list of elements, walls and floor -->
+            <Grid Grid.Column="0" Margin="4,0,4,0" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
 
-        <!-- Left menu: list of elements, walls and floor -->
-        <Grid Grid.Column="0" Margin="4,0,4,0" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-
-            <!--List of models on scene-->
-            <Grid >
-                <ListView x:Name="lvScene" 
+                <!--List of models on scene-->
+                <Grid >
+                    <ListView x:Name="lvScene" 
                           SelectionMode="Single"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           SelectionChanged="lvScene_SelectionChanged" 
                           GotFocus="lvScene_GotFocus"
                           Margin="0,4,0,0"/>
 
-            </Grid>
-
-            <!--Methods to add model on scene-->
-            <StackPanel Grid.Row="1" Margin="2,0,2,0">
-                <!--List of avaliable models-->                
-                <Label Content="Add model" Margin="0,4,0,0"/>
-                <ComboBox Loaded="InitializeModelList" SelectionChanged="cbModelList_SelectionChanged" x:Name="cbModelList" Margin="0,4,0,0"/>
-
-                <!--Bottons to add model on scene-->
-                <Grid Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <!--Botton 1: upload model from file and add it on scene-->
-                    <Button x:Name="btnUploadModelFromFile" Content="Open File..." Grid.Column="0" Height="20" Margin="0,0,2,0" 
-                            Click="UploadModelFromFile"/>
-                    <!--Botton 2: add choosen avaliable model on scene-->
-                    <Button x:Name="btnAddModelToScene" IsEnabled="False" Content="Add model" Grid.Column="1" Height="20" Margin="2,0,0,0" 
-                            Click="AddModelToScene"/>
                 </Grid>
 
-                <!--delite btn-->
-                <Button x:Name="btnDeleteModelFromScene" IsEnabled="False" Content="Delete" Grid.Column="1" Height="20" Margin="0,4,0,0" 
+                <!--Methods to add model on scene-->
+                <StackPanel Grid.Row="1" Margin="2,0,2,0">
+                    <!--List of avaliable models-->
+                    <Label Content="Add model" Margin="0,4,0,0"/>
+                    <ComboBox Loaded="InitializeModelList" SelectionChanged="cbModelList_SelectionChanged" x:Name="cbModelList" Margin="0,4,0,0"/>
+
+                    <!--Bottons to add model on scene-->
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <!--Botton 1: upload model from file and add it on scene-->
+                        <Button x:Name="btnUploadModelFromFile" Content="Open File..." Grid.Column="0" Height="20" Margin="0,0,2,0" 
+                            Click="UploadModelFromFile"/>
+                        <!--Botton 2: add choosen avaliable model on scene-->
+                        <Button x:Name="btnAddModelToScene" IsEnabled="False" Content="Add model" Grid.Column="1" Height="20" Margin="2,0,0,0" 
+                            Click="AddModelToScene"/>
+                    </Grid>
+
+                    <!--delite btn-->
+                    <Button x:Name="btnDeleteModelFromScene" IsEnabled="False" Content="Delete" Grid.Column="1" Height="20" Margin="0,4,0,0" 
                             Click="btnDeleteModelFromScene_Click"/>
 
-                <!--Floor length-->
-                <Grid Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Content="Floor length:" Grid.Column="0"/>
-                    <syncfusion:UpDown x:Name="FloorLength" Grid.Column="1" Step="0.1" 
+                    <!--Floor length-->
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Floor length:" Grid.Column="0"/>
+                        <syncfusion:UpDown x:Name="FloorLength" Grid.Column="1" Step="0.1" 
                                        MinValue="1" MaxValue="100" Value="10" ValueChanging="FloorLength_ValueChanging"/>
-                </Grid>
-                <!--Floor width-->
-                <Grid Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Content="Floor width:" />
-                    <syncfusion:UpDown x:Name="FloorWidth" Grid.Column="1" Step="0.1" 
+                    </Grid>
+                    <!--Floor width-->
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Floor width:" />
+                        <syncfusion:UpDown x:Name="FloorWidth" Grid.Column="1" Step="0.1" 
                                        MinValue="1" MaxValue="100" Value="10" ValueChanging="FloorWidth_ValueChanging"/>
-                </Grid>
-                <!--Ceiling heigt-->
+                    </Grid>
+                    <!--Ceiling heigt-->
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox x:Name="CeilingVisability" Grid.Column="0" VerticalAlignment="Center" IsChecked="True" Checked="CeilingVisability_Checked" Unchecked="CeilingVisability_Unchecked"/>
+                        <Label Content="Ceiling:" Grid.Column="1"/>
+                        <syncfusion:UpDown x:Name="CeilingHeigth" Grid.Column="2" Step="0.1" 
+                                       MinValue="1" MaxValue="100" Value="3.5" ValueChanging="CeilingHeigth_ValueChanging"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+
+            <!--Central Viewport: scene-->
+            <HelixToolkit:HelixViewport3D ZoomExtentsWhenLoaded="True" Grid.Column="1" Name="m_helix_viewport" GotFocus="lvScene_LostFocus">
+                <!-- Remember to add light to the scene -->
+                <HelixToolkit:SunLight/>
+                <HelixToolkit:GridLinesVisual3D x:Name="Grid" Width="30" Length="30" 
+                                            MinorDistance="1" MajorDistance="5" Thickness="0.01"/>
+                <HelixToolkit:RectangleVisual3D x:Name="Ceiling" Width="10" Length="10" Origin="0,0,3.5" Visible="True">
+                    <HelixToolkit:RectangleVisual3D.Material>
+                        <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                                <SolidColorBrush Color="LightGray"/>
+                            </DiffuseMaterial.Brush>
+                        </DiffuseMaterial>
+                    </HelixToolkit:RectangleVisual3D.Material>
+                </HelixToolkit:RectangleVisual3D>
+                <HelixToolkit:RectangleVisual3D x:Name="Floor" Width="10" Length="10">
+                    <HelixToolkit:RectangleVisual3D.Material>
+                        <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                                <SolidColorBrush Color="Gray"/>
+                            </DiffuseMaterial.Brush>
+                        </DiffuseMaterial>
+                    </HelixToolkit:RectangleVisual3D.Material>
+                </HelixToolkit:RectangleVisual3D>
+                <!-- The content of this visual is defined in MainViewModel.cs -->
+                <ModelVisual3D x:Name="foo"/>
+
+            </HelixToolkit:HelixViewport3D>
+
+            <!-- Rigth menu of choosen element-->
+            <StackPanel Grid.Column="2" Margin="4,0,4,0">
+                <!-- Chose element -->
+                <Label Content="Model:"/>
+                <Label x:Name="lChosenModel" Content="Chose model to work with" />
+
+                <!--Coordinates-->
+                <Label Content="Coordinates" Margin="0,4,0,0"/>
+                <!--x coordinate-->
                 <Grid Margin="0,4,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
                     </Grid.ColumnDefinitions>
-                    <CheckBox x:Name="CeilingVisability" Grid.Column="0" VerticalAlignment="Center" IsChecked="True" Checked="CeilingVisability_Checked" Unchecked="CeilingVisability_Unchecked"/>
-                    <Label Content="Ceiling:" Grid.Column="1"/>
-                    <syncfusion:UpDown x:Name="CeilingHeigth" Grid.Column="2" Step="0.1" 
-                                       MinValue="1" MaxValue="100" Value="3.5" ValueChanging="CeilingHeigth_ValueChanging"/>
+                    <Label Content="x:" Grid.Column="0"/>
+                    <syncfusion:UpDown x:Name="udXCoord" Grid.Column="1" IsEnabled="False"
+                                   Step="0.1" MinValue="-1000" MaxValue="1000" Value="0"
+                                   ValueChanging="Coordinate_ValueChanging"/>
                 </Grid>
-            </StackPanel>
-        </Grid>
 
-        <!--Central Viewport: scene-->
-        <HelixToolkit:HelixViewport3D ZoomExtentsWhenLoaded="True" Grid.Column="1" Name="m_helix_viewport" GotFocus="lvScene_LostFocus">
-            <!-- Remember to add light to the scene -->
-            <HelixToolkit:SunLight/>
-            <HelixToolkit:GridLinesVisual3D x:Name="Grid" Width="30" Length="30" 
-                                            MinorDistance="1" MajorDistance="5" Thickness="0.01"/>
-            <HelixToolkit:RectangleVisual3D x:Name="Ceiling" Width="10" Length="10" Origin="0,0,3.5">
-                <HelixToolkit:RectangleVisual3D.Material>
-                    <DiffuseMaterial>
-                        <DiffuseMaterial.Brush>
-                            <SolidColorBrush Color="LightGray"/>
-                        </DiffuseMaterial.Brush>
-                    </DiffuseMaterial>
-                </HelixToolkit:RectangleVisual3D.Material>
-            </HelixToolkit:RectangleVisual3D>
-            <HelixToolkit:RectangleVisual3D x:Name="Floor" Width="10" Length="10">
-                <HelixToolkit:RectangleVisual3D.Material>
-                    <DiffuseMaterial>
-                        <DiffuseMaterial.Brush>
-                            <SolidColorBrush Color="Gray"/>
-                        </DiffuseMaterial.Brush>
-                    </DiffuseMaterial>
-                </HelixToolkit:RectangleVisual3D.Material>
-            </HelixToolkit:RectangleVisual3D>
-            <!-- The content of this visual is defined in MainViewModel.cs -->
-            <ModelVisual3D x:Name="foo"/>
-            
-        </HelixToolkit:HelixViewport3D>
-
-        <!-- Rigth menu of choosen element-->
-        <StackPanel Grid.Column="2" Margin="4,0,4,0">
-            <!-- Chose element -->
-            <Label Content="Model:"/>
-            <Label x:Name="lChosenModel" Content="Chose model to work with" />
-
-            <!--Coordinates-->
-            <Label Content="Coordinates" Margin="0,4,0,0"/>
-            <!--x coordinate-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="x:" Grid.Column="0"/>
-                <syncfusion:UpDown x:Name="udXCoord" Grid.Column="1" IsEnabled="False"
+                <!--y coordinate-->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="y: " Grid.Column="0"/>
+                    <syncfusion:UpDown x:Name="udYCoord" Grid.Column="1" IsEnabled="False"
                                    Step="0.1" MinValue="-1000" MaxValue="1000" Value="0"
                                    ValueChanging="Coordinate_ValueChanging"/>
-            </Grid>
-            
-            <!--y coordinate-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="y: " Grid.Column="0"/>
-                <syncfusion:UpDown x:Name="udYCoord" Grid.Column="1" IsEnabled="False"
-                                   Step="0.1" MinValue="-1000" MaxValue="1000" Value="0"
-                                   ValueChanging="Coordinate_ValueChanging"/>
-            </Grid>
-            <!--z coordinate-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="z: " Grid.Column="0"/>
-                <syncfusion:UpDown x:Name="udZCoord" Grid.Column="1" IsEnabled="False" 
+                </Grid>
+                <!--z coordinate-->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="z: " Grid.Column="0"/>
+                    <syncfusion:UpDown x:Name="udZCoord" Grid.Column="1" IsEnabled="False" 
                                    Step="0.1" MinValue="-1000" MaxValue="1000" Value="0" 
                                    ValueChanging="Coordinate_ValueChanging"/>
-            </Grid>
+                </Grid>
 
-            <!--Angles-->
-            <Label Content="Rotate" Margin="0,4,0,0"/>
-            <!--x angle-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="x: " Grid.Column="0"/>
-                <Slider x:Name="slXangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
+                <!--Angles-->
+                <Label Content="Rotate" Margin="0,4,0,0"/>
+                <!--x angle-->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="x: " Grid.Column="0"/>
+                    <Slider x:Name="slXangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
                         Maximum="360" Minimum="-360" TickFrequency="45" Value="0"
                         ValueChanged="angle_ValueChanged"
                             />
-            </Grid>
-            <!--y angle-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="y: " Grid.Column="0"/>
-                <Slider x:Name="slYangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
+                </Grid>
+                <!--y angle-->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="y: " Grid.Column="0"/>
+                    <Slider x:Name="slYangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
                         Maximum="360" Minimum="-360" Value="0" TickFrequency="45" 
                         ValueChanged="angle_ValueChanged"/>
-            </Grid>
-            <!--z angle-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="z: " Grid.Column="0"/>
-                <Slider x:Name="slZangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
+                </Grid>
+                <!--z angle-->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="z: " Grid.Column="0"/>
+                    <Slider x:Name="slZangle" Grid.Column="1" IsEnabled="False" TickPlacement="BottomRight"
                         Maximum="360" Minimum="-360" TickFrequency="45"  Value="0"
                         ValueChanged="angle_ValueChanged"/>
-            </Grid>
-            <!--Model size-->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="Size" Margin="0,-2,0,2"></Label>
-                <!--Sizes-->
-                <syncfusion:UpDown x:Name="udModelSize" Grid.Column="1" IsEnabled="False"
+                </Grid>
+                <!--Model size-->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Size" Margin="0,-2,0,2"></Label>
+                    <!--Sizes-->
+                    <syncfusion:UpDown x:Name="udModelSize" Grid.Column="1" IsEnabled="False"
                                    Step="0.1" MinValue="0.001" MaxValue="10000" Value="100"
                                    ValueChanging="udModelSize_ValueChanging" />
-            </Grid>
+                </Grid>
 
-        </StackPanel>
-
-
-    </Grid>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
 </Window>

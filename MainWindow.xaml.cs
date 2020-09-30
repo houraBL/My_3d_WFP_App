@@ -21,6 +21,10 @@ using HelixToolkit.Wpf;
 using System.Windows.Media.Media3D;
 using Microsoft.Win32;
 using HelixToolkit.Wpf.SharpDX;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using System.Windows.Forms;
+using MessageBox = System.Windows.Forms.MessageBox;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace My_3d_WFP_App
 {
@@ -29,7 +33,7 @@ namespace My_3d_WFP_App
     /// </summary>
     public partial class MainWindow : Window
     {
-        //List<BasicModel> ModelList;
+        
         static MyScene myScene;
         static List<string> modelList;
 
@@ -64,21 +68,79 @@ namespace My_3d_WFP_App
             /// <param name="path .obj file please"></param>
             public void AddElement(string path)
             {
-                var unicName = Path.GetFileNameWithoutExtension(path);
-                var almostUnicName = unicName;
-                var unicNumber = 0;
-                while (names.Contains(almostUnicName)) {
-                    almostUnicName = unicName + unicNumber++;
-                }
-                names.Add(almostUnicName);
-                paths.Add(path);
-                transformations.Add(new double[7] { 0, 0, 0, 0, 0, 0, 100 }); // x, y, z, xangle, yangle, zangle, scale;
-                scene.Children.Add(new HelixToolkit.Wpf.ModelImporter().Load(path));
-                RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 90));
-                scene.Children.Last().Transform = myRotateTransform;
-                var sizex = scene.Children.Last().Bounds.SizeX;
-                var x = scene.Children.Last().Bounds.X;
+                try
+                {
+                    var unicName = Path.GetFileNameWithoutExtension(path);
+                    var almostUnicName = unicName;
+                    var unicNumber = 0;
+                    while (names.Contains(almostUnicName))
+                    {
+                        almostUnicName = unicName + unicNumber++;
+                    }
+                    names.Add(almostUnicName);
+                    paths.Add(path);
+                    transformations.Add(new double[7] { 0, 0, 0, 0, 0, 0, 100 }); // x, y, z, xangle, yangle, zangle, scale;
+                    scene.Children.Add(new HelixToolkit.Wpf.ModelImporter().Load(path));
 
+                    RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 90));
+                    scene.Children.Last().Transform = myRotateTransform;
+                    var sizex = scene.Children.Last().Bounds.SizeX;
+                    var x = scene.Children.Last().Bounds.X;
+                }
+                catch (FileNotFoundException e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+                catch (DirectoryNotFoundException e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+                catch (InvalidOperationException e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+            }
+
+            public void AddElementFromArray(string[] modelData)
+            {
+                try
+                {
+                    if (modelData.Length != 9) throw new Exception("Model Data has more lements then expected");
+                    names.Add(modelData[0]);
+                    paths.Add(modelData[1]);
+                    transformations.Add(new double[7] { Convert.ToDouble(modelData[2]), Convert.ToDouble(modelData[3]), Convert.ToDouble(modelData[4]),
+                    Convert.ToDouble(modelData[5]), Convert.ToDouble(modelData[6]), Convert.ToDouble(modelData[7]), Convert.ToDouble(modelData[8])});
+                    scene.Children.Add(new HelixToolkit.Wpf.ModelImporter().Load(modelData[1]));
+                    this.Transform(names.Last());
+                }
+                catch (FileNotFoundException e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+                catch (DirectoryNotFoundException e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+                catch (InvalidOperationException e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not add Model. Original error: " + e.Message);
+                }
+            }
+
+            public void ClearScene()
+            {
+                while(names.Count!=0)
+                {
+                    DeleteElement(names.Last());
+                }
             }
 
             /// <summary>
@@ -91,6 +153,7 @@ namespace My_3d_WFP_App
                 {
                     paths.RemoveAt(names.IndexOf(selectedItem));
                     scene.Children.RemoveAt(names.IndexOf(selectedItem));
+                    transformations.RemoveAt(names.IndexOf(selectedItem));
                     names.RemoveAt(names.IndexOf(selectedItem));
                 }
             }
@@ -334,7 +397,7 @@ namespace My_3d_WFP_App
         /// <param name="e"></param>
         private void CeilingHeigth_ValueChanging(object sender, Syncfusion.Windows.Shared.ValueChangingEventArgs e)
         {
-            Ceiling.Origin = new Point3D(0, 0, (double)e.NewValue);
+            Ceiling.Visible = !Ceiling.Visible;
         }
 
         /// <summary>
@@ -425,10 +488,212 @@ namespace My_3d_WFP_App
         }
         #endregion
 
-        private void slXangle_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        #region Menu, Saves and Resent Progects
+        private void NewProject_Click(object sender, RoutedEventArgs e)
         {
-
+            // если на сцене что-то есть
+            // предложить сохранить - диалог() - ответы - свитч
+            //если да - SaveProject()
+            //если нет - не сохранять, создать_новый_проект()
+            //отмена - закрыть окошко
+            // если на сцене пусто
+            // создать новую сцену с дефолтными настройками
+            if (lvScene.Items.Count != 0)
+            {
+                // предложить сохранить текущий проект
+                MessageBoxResult r = (MessageBoxResult)MessageBox.Show("Would you like to save current Project?", "Closing program", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                switch (r)
+                {
+                    case MessageBoxResult.Yes:
+                        {
+                            SaveProject();
+                            MessageBox.Show("Project Saved Sucsessfully", "Project Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            myScene.ClearScene();
+                            
+                            break;
+                        }
+                    case MessageBoxResult.No:
+                        {
+                            myScene.ClearScene();
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+                lvScene.ItemsSource = myScene.Names;
+                lvScene.Items.Refresh();
+            }
         }
+
+        private void OpenResent_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult r = (MessageBoxResult)MessageBox.Show("Would you like to save current Project?", "Closing program", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            switch (r)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        SaveProject();
+                        MessageBox.Show("Project Saved Sucsessfully", "Closing program", MessageBoxButtons.OK, MessageBoxIcon.Information);                        
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
+            OpenProject();            
+        }
+
+        private void OpenProject()
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "My3Dformat files (*.my3Dformat)|*.my3Dformat";
+            Nullable<bool> result = fileDialog.ShowDialog();
+            if (result == true)
+            {
+                string filename = Path.GetFileName(fileDialog.FileName);
+                string path = Path.GetDirectoryName(fileDialog.FileName);
+
+                // открыть файлы со специальным расширением
+                // и прочитать их построчно :))))
+                // Read file
+                using (var streamReader = new StreamReader(fileDialog.FileName))
+                {
+                    string line;
+                    string floorW = "floorWidth ";
+                    string floorL = "floorLength ";
+                    string ceilingV = "ceiling ";
+                    string modelsC = "models ";
+                    bool floorWFound = false, floorLFound = false, ceilingVFound = false, modelsCFound = false;
+                    int modelsCount = 0;
+                    myScene.ClearScene();
+
+                    // do while its not the end of file
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        #region scene settings
+                        if (!floorWFound && line.IndexOf(floorW) != -1)
+                        {
+                            FloorWidth.Value = Ceiling.Width = Convert.ToDouble(line.Substring(line.IndexOf(floorW) + floorW.Length));
+                            floorWFound = !floorWFound;
+                            continue;
+                        }
+                        if (!floorLFound && line.IndexOf(floorL) != -1)
+                        {
+                            FloorLength.Value = Ceiling.Length = Convert.ToDouble(line.Substring(line.IndexOf(floorL) + floorL.Length));
+                            floorLFound = !floorLFound;
+                            continue;
+                        }
+                        if (!ceilingVFound && line.IndexOf(ceilingV) != -1)
+                        {
+                            Ceiling.Visible = Convert.ToBoolean(line.Substring(line.IndexOf(ceilingV) + ceilingV.Length));
+                            ceilingVFound = !ceilingVFound;
+                            continue;
+                        }
+                        if (!modelsCFound && line.IndexOf(modelsC) != -1)
+                        {
+                            modelsCount = Convert.ToInt32(line.Substring(line.IndexOf(modelsC) + modelsC.Length));
+                            modelsCFound = !modelsCFound;
+                            continue;
+                        }
+                        if (line == "name source coordinateX coordinateY coordinateZ rotationX rotationY rotationZ size") continue;
+                        #endregion
+
+                        #region model opening
+
+                        string[] delimiters = new string[] { " " };
+
+                        string[] modelData = line.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+
+                        myScene.AddElementFromArray(modelData);
+
+                        #endregion
+
+                    }
+                }
+                lvScene.ItemsSource = myScene.Names;
+                lvScene.Items.Refresh();
+            }
+        }
+
+        private void SaveProject_Click(object sender, RoutedEventArgs e)
+        {
+            SaveProject();
+        }
+
+        private void SaveProject()
+        {
+            // собственно сздать файл в котором будут:
+            // информация о сцене: размер пола, виден ли потолок
+            // количество моделей на сцене
+            // название модели - путь - координаты - вращения - размер
+            // ??? создать папку и туды закидывать все модели? meh
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.DefaultExt = ".my3Dformat";
+            saveFileDialog.FileName = "NewProject";
+            Nullable<bool> result = saveFileDialog.ShowDialog();
+            if (result == true)
+            {
+                string filename = Path.GetFileName(saveFileDialog.FileName);
+                string path = Path.GetDirectoryName(saveFileDialog.FileName);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                if (!File.Exists(saveFileDialog.FileName))
+                {
+                    File.Create(saveFileDialog.FileName).Close();
+                }
+                string myProject = $"floorWidth {FloorWidth.Value}\nfloorLength {FloorLength.Value}\nceiling {Ceiling.Visible}\nmodels {lvScene.Items.Count}";
+                myProject += "\nname source coordinateX coordinateY coordinateZ rotationX rotationY rotationZ size";
+                foreach (string model in lvScene.Items)
+                {
+                    myProject += $"\n{model}" + //name
+                        $" {myScene.Paths.ElementAt(myScene.Names.IndexOf(model))}" + //path
+                        $" {myScene.GetTransformations(model)[0]} {myScene.GetTransformations(model)[1]} {myScene.GetTransformations(model)[2]}" + //coord x y z
+                        $" {myScene.GetTransformations(model)[3]} {myScene.GetTransformations(model)[4]} {myScene.GetTransformations(model)[5]}" + //rot x y z
+                        $" {myScene.GetTransformations(model)[6]}"; //size
+                }
+                File.WriteAllText(saveFileDialog.FileName, myProject);
+                // other logic
+            }
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            // предложить сохранить текущий проект
+            MessageBoxResult r = (MessageBoxResult)MessageBox.Show("Would you like to save current Project?", "Closing program", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            switch (r)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        SaveProject();
+                        MessageBox.Show("Project Saved Sucsessfully", "Closing program", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        System.Windows.Application.Current.Shutdown();
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    {
+                        System.Windows.Application.Current.Shutdown();
+                        break; 
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }            
+        }
+
+        private void Heart_Click(object sender, RoutedEventArgs e)
+        {
+            //сердечко
+            MessageBoxResult heartResult = (MessageBoxResult)MessageBox.Show("I love you", "<3", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            if (heartResult == MessageBoxResult.OK)
+            {
+                MessageBox.Show("<3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 <3 ", "<3", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        #endregion
     }
 }
 

@@ -1,0 +1,9 @@
+floorWidth 10
+floorLength 10
+ceiling True
+models 4
+name source coordinateX coordinateY coordinateZ rotationX rotationY rotationZ size
+Canaan_Dog C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/Canaan_Dog.obj 0 0 0 0 0 0 4,9
+Cat C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/Cat.obj 6 5 0 0 0 0 100
+newsofa C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/newsofa.obj 0 0 0 338,095238095238 319,047619047619 261,904761904762 98,8000000000001
+Cat2 C:/Users/Anastasiia/source/repos/My_3d_WFP_App/furniture/Cat2.obj 60 16 4,1 -99,9999999999991 90,4761904761902 0 5
